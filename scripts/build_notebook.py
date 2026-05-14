@@ -103,7 +103,7 @@ cells = [
         LABELED_MESSAGES_PATH = OUTPUT_DIR / "labeled_messages.csv"
 
         RANDOM_STATE = 42
-        LABELING_SAMPLE_SIZE = 1000
+        LABELING_SAMPLE_SIZE = 10000
         # Поставьте None, если хотите прогнать notebook по всем сообщениям.
         # По умолчанию берём 80000 сообщений, чтобы notebook быстрее пересчитывался.
         MAX_MESSAGES_FOR_NOTEBOOK = 80000
@@ -369,13 +369,24 @@ cells = [
             ]
 
         OUTPUT_DIR.mkdir(exist_ok=True)
-        if not LABELING_SAMPLE_PATH.exists():
+        if LABELING_SAMPLE_PATH.exists():
+            existing_labeling_sample = pd.read_csv(LABELING_SAMPLE_PATH)
+        else:
+            existing_labeling_sample = None
+
+        if existing_labeling_sample is None or len(existing_labeling_sample) < LABELING_SAMPLE_SIZE:
             labeling_sample = build_labeling_sample(messages)
             labeling_sample.to_csv(LABELING_SAMPLE_PATH, index=False, encoding="utf-8-sig")
-            print(f"Создан файл для разметки: {LABELING_SAMPLE_PATH}")
+            if existing_labeling_sample is None:
+                print(f"Создан файл для разметки: {LABELING_SAMPLE_PATH}")
+            else:
+                print(
+                    f"Файл был меньше нужного размера "
+                    f"({len(existing_labeling_sample)} < {LABELING_SAMPLE_SIZE}) и пересоздан: {LABELING_SAMPLE_PATH}"
+                )
         else:
-            labeling_sample = pd.read_csv(LABELING_SAMPLE_PATH)
-            print(f"Файл уже существует: {LABELING_SAMPLE_PATH}")
+            labeling_sample = existing_labeling_sample
+            print(f"Файл уже существует: {LABELING_SAMPLE_PATH} ({len(labeling_sample)} строк)")
 
         labeling_sample.drop(columns=["text"]).head()
         """,

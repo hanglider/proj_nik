@@ -239,7 +239,7 @@ def write_csv(rows: list[dict[str, object]], output_path: Path) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Prepare anonymized Telegram messages for manual toxicity labeling.")
-    parser.add_argument("--sample-size", type=int, default=1000)
+    parser.add_argument("--sample-size", type=int, default=10000)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
